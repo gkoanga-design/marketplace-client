@@ -1,0 +1,59 @@
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  transition: background .3s, padding .3s, box-shadow .3s;
+}
+
+.scrolled {
+  background: rgba(13,13,13,0.95);
+  backdrop-filter: blur(12px);
+  padding: 14px 48px;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.logo {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.logo span { color: var(--accent); }
+
+.links {
+  display: flex;
+  gap: 32px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.links a { transition: color .2s; }
+.links a:hover, .links .active { color: var(--text); }
+
+.actions { display: flex; gap: 10px; }
+
+.btnLogin {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 20px;
+  border-radius: 99px;
+  font-size: 13px;
+  transition: border-color .2s;
+}
+.btnLogin:hover { border-color: var(--text-muted); }
+
+.btnRegister {
+  background: var(--accent);
+  color: #0d0d0d;
+  padding: 9px 20px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity .2s;
+}
+.btnRegister:hover { opacity: .85; }
