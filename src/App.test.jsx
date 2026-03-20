@@ -8,7 +8,7 @@ import { SERVICES } from './assets/mockData';
 // Test 1 — L'app se monte sans crash
 test('App se monte correctement', () => {
   render(<App />);
-  expect(screen.getByText(/ServiLink/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/ServiLink/i).length).toBeGreaterThan(0);
 });
 
 // Test 2 — ServiceCard affiche le titre

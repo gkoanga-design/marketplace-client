@@ -16,7 +16,7 @@ build-job:
     variables: true
   stage: build-test
   script:
-    - npm ci
+    - npm install
     - npm test
     - npm run build
     - mkdir staging && cp -r build/* staging/
@@ -34,7 +34,7 @@ check-lint-job:
     variables: true
   stage: check-lint
   script:
-    - npm ci
+    - npm install
     - npm run lint || true
 
 # ── STAGE 3 : Deploy (manuel) ────────────────────────────────
