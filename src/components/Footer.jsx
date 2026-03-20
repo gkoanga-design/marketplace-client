@@ -13,21 +13,21 @@ export default function Footer() {
         <div className={styles.links}>
           <div>
             <h4>Clients</h4>
-            <a href="#">Trouver un service</a>
-            <a href="#">Comment ça marche</a>
-            <a href="#">Avis & notes</a>
+            <a href="/services">Trouver un service</a>
+            <a href="/#comment">Comment ça marche</a>
+            <a href="/services">Avis & notes</a>
           </div>
           <div>
             <h4>Prestataires</h4>
-            <a href="#">Proposer un service</a>
-            <a href="#">Tableau de bord</a>
-            <a href="#">Devenir partenaire</a>
+            <a href="/services">Proposer un service</a>
+            <a href="/services">Tableau de bord</a>
+            <a href="/services">Devenir partenaire</a>
           </div>
           <div>
             <h4>Légal</h4>
-            <a href="#">Conditions d'utilisation</a>
-            <a href="#">Confidentialité</a>
-            <a href="#">Contact</a>
+            <a href="/">Conditions d'utilisation</a>
+            <a href="/">Confidentialité</a>
+            <a href="/">Contact</a>
           </div>
         </div>
       </div>
