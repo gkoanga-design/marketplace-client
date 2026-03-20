@@ -100,7 +100,7 @@ jobs:
         run: pwd && ls .
 
       - name: Build docker image
-        run: docker build --no-cache -t TON_USERNAME/servilink-frontend:0.0.1 .
+        run: docker build --no-cache -t gilles06/servilink-frontend:0.0.1 .
 
       - name: Show image
         run: docker image ls
@@ -109,6 +109,6 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Push image to Docker Hub
-        run: docker push TON_USERNAME/servilink-frontend:0.0.1
+        run: docker push gilles06/servilink-frontend:0.0.1
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
