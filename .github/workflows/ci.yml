@@ -1,0 +1,114 @@
+name: build and deploy image
+
+on:
+  push:
+    branches: [ main, release ]
+    paths-ignore:
+      - '**/README.md'
+      - '**/GUIDE.md'
+
+jobs:
+
+  # ────────────────────────────────────────────
+  # JOB 1 — Build & Tests
+  # ────────────────────────────────────────────
+  build:
+    name: Build job
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build React app
+        run: npm run build
+
+      - name: Create staging directory
+        run: mkdir staging && cp -r build/* staging/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: servilink-build
+          path: staging/
+          if-no-files-found: error
+          retention-days: 5
+
+      - name: Show uploaded artifacts
+        run: ls staging/
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  # ────────────────────────────────────────────
+  # JOB 2 — Analyse (lint)
+  # ────────────────────────────────────────────
+  check-lint:
+    name: Analysis job
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint || true
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  # ────────────────────────────────────────────
+  # JOB 3 — Deploy (Docker Hub)
+  # ────────────────────────────────────────────
+  deploy:
+    name: Deploy job
+    needs: [build, check-lint]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifacts from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: servilink-build
+
+      - name: Show downloaded artifacts directory
+        run: pwd && ls .
+
+      - name: Build docker image
+        run: docker build --no-cache -t TON_USERNAME/servilink-frontend:0.0.1 .
+
+      - name: Show image
+        run: docker image ls
+
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_HUB_USER }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Push image to Docker Hub
+        run: docker push TON_USERNAME/servilink-frontend:0.0.1
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."

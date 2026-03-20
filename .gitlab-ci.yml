@@ -1,0 +1,57 @@
+stages:
+  - build-test
+  - check-lint
+  - deploy
+
+default:
+  image: node:18-alpine
+
+variables:
+  NODE_OPTIONS: "--max_old_space_size=2048"
+
+# ── STAGE 1 : Build & Tests ──────────────────────────────────
+build-job:
+  inherit:
+    default: true
+    variables: true
+  stage: build-test
+  script:
+    - npm ci
+    - npm test
+    - npm run build
+    - mkdir staging && cp -r build/* staging/
+  artifacts:
+    paths:
+      - staging/
+  cache:
+    paths:
+      - node_modules/
+
+# ── STAGE 2 : Lint ───────────────────────────────────────────
+check-lint-job:
+  inherit:
+    default: true
+    variables: true
+  stage: check-lint
+  script:
+    - npm ci
+    - npm run lint || true
+
+# ── STAGE 3 : Deploy (manuel) ────────────────────────────────
+build-docker-image-job:
+  image: docker:latest
+  inherit:
+    default: false
+    variables: false
+  stage: deploy
+  services:
+    - docker:dind
+  script:
+    - docker build -t $DOCKER_USER/servilink-frontend:0.0.1 .
+    - docker save $DOCKER_USER/servilink-frontend:0.0.1 > servilink-frontend.tar
+    - docker login -u $DOCKER_USER -p $DOCKER_HUB_TOKEN
+    - docker push $DOCKER_USER/servilink-frontend:0.0.1
+  artifacts:
+    paths:
+      - servilink-frontend.tar
+  when: manual
