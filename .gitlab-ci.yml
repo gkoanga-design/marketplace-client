@@ -47,10 +47,10 @@ build-docker-image-job:
   services:
     - docker:dind
   script:
-    - docker build -t $DOCKER_USER/servilink-frontend:0.0.1 .
-    - docker save $DOCKER_USER/servilink-frontend:0.0.1 > servilink-frontend.tar
+    - docker build -t $DOCKER_USER/servilink-frontend:0.0.1-gitlab . 
+    - docker save $DOCKER_USER/servilink-frontend:0.0.1-gitlab > servilink-frontend.tar
     - docker login -u $DOCKER_USER -p $DOCKER_HUB_TOKEN
-    - docker push $DOCKER_USER/servilink-frontend:0.0.1
+    - docker push $DOCKER_USER/servilink-frontend:0.0.1-gitlab
   artifacts:
     paths:
       - servilink-frontend.tar
