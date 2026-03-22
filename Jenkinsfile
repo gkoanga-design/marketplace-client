@@ -1,54 +1,73 @@
-// ============================================================
-// Jenkinsfile — Pipeline Jenkins  |  ServiLink Frontend
-// ============================================================
-
 pipeline {
-    agent {
-        docker {
-            image 'node:18-alpine'
-        }
-    }
+    agent none
 
     stages {
 
-        stage('Checkout') {
+        stage('Build React') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    args '-u root'
+                }
+            }
             steps {
-                echo '=== Récupération du code ==='
-                checkout scm
+                sh 'npm install'
+                sh 'npm run build'
+                sh 'mkdir -p staging && cp -r build/* staging/'
             }
         }
 
-        stage('Install') {
-            steps {
-                echo '=== Installation des dépendances ==='
-                sh 'npm ci'
+        stage('Unit Test') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    args '-u root'
+                }
             }
-        }
-
-        stage('Test') {
             steps {
-                echo '=== Tests unitaires ==='
+                sh 'npm install'
                 sh 'npm test'
             }
         }
 
-        stage('Build') {
+        stage('Push to Docker Hub') {
+            agent {
+                docker {
+                    image 'docker:25.0.3'
+                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
-                echo '=== Build de production ==='
-                sh 'npm run build'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub_credentials',
+                    passwordVariable: 'DOCKER_HUB_PASSWORD',
+                    usernameVariable: 'DOCKER_HUB_USERNAME'
+                )]) {
+                    sh 'docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD'
+                    sh 'docker build -t $DOCKER_HUB_USERNAME/servilink-frontend:v$BUILD_NUMBER .'
+                    sh 'docker push $DOCKER_HUB_USERNAME/servilink-frontend:v$BUILD_NUMBER'
+                }
             }
         }
 
-        stage('Archive') {
+        stage('Deploy') {
+            agent any
             steps {
-                echo '=== Archivage du build ==='
-                archiveArtifacts artifacts: 'build/**/*', fingerprint: true
+                script {
+                    def userInput = input(
+                        message: 'Voulez-vous déployer ServiLink sur le serveur ?',
+                        ok: 'Déployer'
+                    )
+                    if (userInput != null) {
+                        echo "Déploiement de servilink-frontend:v${BUILD_NUMBER}"
+                    }
+                }
             }
         }
     }
 
     post {
-        success { echo '✅ Pipeline ServiLink terminé avec succès !' }
-        failure { echo '❌ Échec du pipeline ServiLink.' }
+        success { echo 'Pipeline ServiLink build successfully' }
+        failure { echo 'Pipeline ServiLink failed' }
     }
 }
