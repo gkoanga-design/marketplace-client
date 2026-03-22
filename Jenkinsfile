@@ -34,7 +34,7 @@ pipeline {
             agent {
                 docker {
                     image 'docker:25.0.3'
-                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
+                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST=unix:///var/run/docker.sock'
                 }
             }
             steps {
