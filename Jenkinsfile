@@ -31,12 +31,7 @@ pipeline {
         }
 
         stage('Push to Docker Hub') {
-            agent {
-                docker {
-                    image 'docker:25.0.3'
-                    args '-u root --entrypoint="" -e DOCKER_HOST=tcp://host.docker.internal:2375'
-                }
-            }
+            agent any
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub_credentials',
